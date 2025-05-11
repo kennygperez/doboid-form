@@ -1,7 +1,6 @@
+import { useForm } from '@doboid/form';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './index.css';
-import { useForm } from '@doboid/form';
 import { z } from 'zod';
 
 const root = document.getElementById('root');
@@ -15,7 +14,7 @@ if (root) {
 }
 
 const validators = z.object({
-  email: z.string().email(),
+  email: z.string().max(2).email(),
   password: z.string().min(2),
 });
 
@@ -33,10 +32,13 @@ function MyFunckyForm() {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        dorm.handleSubmit(console.log);
+        dorm.handleSubmit((v) => {
+          alert(JSON.stringify(v, null, 2));
+          dorm.errors.set('root', 'wtf');
+        });
       }}
     >
-      <dorm.Field.email
+      <dorm.Fields.email
         children={(field) => (
           <div>
             <input
@@ -44,14 +46,14 @@ function MyFunckyForm() {
               id={field.id}
               name={field.name}
               value={field.value}
-              onChange={(e) => field.handleChange(e.target.value)}
+              onChange={field.handleChange}
             />
-            {field.issues?.length > 0 && <>{JSON.stringify(field.issues)}</>}
+            <p style={{ color: 'red' }}>{dorm.errors.get(field.id)}</p>
           </div>
         )}
       />
 
-      <dorm.Field.password
+      <dorm.Fields.password
         children={(field) => (
           <div>
             <input
@@ -59,12 +61,14 @@ function MyFunckyForm() {
               id={field.id}
               name={field.name}
               value={field.value}
-              onChange={(e) => field.handleChange(e.target.value)}
+              onChange={field.handleChange}
             />
-            {field.issues?.length > 0 && <>{JSON.stringify(field.issues)}</>}
+            <p style={{ color: 'red' }}>{dorm.errors.get(field.id)}</p>
           </div>
         )}
       />
+
+      <p style={{ color: 'red' }}>{dorm.errors.get('root')}</p>
 
       <button type="submit">submit</button>
     </form>

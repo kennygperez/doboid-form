@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@doboid/form':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: link:../..
+        version: link:../..
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -38,9 +38,6 @@ importers:
         version: 6.3.5
 
 packages:
-
-  '@doboid/form@0.0.1':
-    resolution: {integrity: sha512-wQ/kA99+t+pt77JkIHDJLEeuTBxYBdGm0A3n+2aUS+GMEeFNe++JwUdtmZo5Py71dW6HV6o2yr7Xv8MRRxmBGQ==}
 
   '@esbuild/aix-ppc64@0.25.4':
     resolution: {integrity: sha512-1VCICWypeQKhVbE9oW/sJaAmjLxhVqacdkvPLEjwlttjfwENRSClS8EjBz0KzRyFSCPDIkuXW34Je/vk7zdB7Q==}
@@ -292,9 +289,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@standard-schema/spec@1.0.0':
-    resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
-
   '@swc/core-darwin-arm64@1.11.24':
     resolution: {integrity: sha512-dhtVj0PC1APOF4fl5qT2neGjRLgHAAYfiVP8poJelhzhB/318bO+QCFWAiimcDoyMgpCXOhTp757gnoJJrheWA==}
     engines: {node: '>=10'}
@@ -498,12 +492,6 @@ packages:
 
 snapshots:
 
-  '@doboid/form@0.0.1':
-    dependencies:
-      '@standard-schema/spec': 1.0.0
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-
   '@esbuild/aix-ppc64@0.25.4':
     optional: true
 
@@ -638,8 +626,6 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.40.2':
     optional: true
-
-  '@standard-schema/spec@1.0.0': {}
 
   '@swc/core-darwin-arm64@1.11.24':
     optional: true
