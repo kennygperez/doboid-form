@@ -35,7 +35,7 @@ export function useForm<
                 formErrorRef.current[key] = issues[0].message;
               }
             } else {
-              formStateRef.current[key] = result.value as TData[Extract<keyof TData, string>];
+              formStateRef.current = result.value as TData;
             }
 
             setData(formStateRef.current[key]);
