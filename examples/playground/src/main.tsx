@@ -26,10 +26,11 @@ function Playground() {
       num: z.number().max(3),
     }),
   });
-  Fields;
+
+  const onSubmit = dorm.onSubmit((v) => console.log(v));
 
   return (
-    <form onSubmit={dorm.onSubmit((v) => console.log(v))}>
+    <form onSubmit={onSubmit}>
       <Fields.Str
         children={(f) => (
           <div>

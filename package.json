@@ -1,6 +1,6 @@
 {
   "name": "@doboid/form",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Kenny G Perez",
   "license": "MIT",
   "main": "dist/index.js",

@@ -6,10 +6,12 @@ export async function runValidator<TData>(
   formStateRef: React.RefObject<TData>,
   formErrorRef: React.RefObject<DoboidErrorMap>,
   key?: string,
-) {
+): Promise<boolean> {
   let result = schema['~standard'].validate(formStateRef.current);
 
-  if (result instanceof Promise) result = await result;
+  if (result instanceof Promise) {
+    result = await result;
+  }
 
   if (result.issues) {
     if (key) {
@@ -31,11 +33,15 @@ export async function runValidator<TData>(
 
       formErrorRef.current = newMap;
     }
-  } else {
-    formStateRef.current = result.value as TData;
 
-    if (key) {
-      formErrorRef.current[key] = [];
-    }
+    return false;
   }
+
+  formStateRef.current = result.value as TData;
+
+  if (key) {
+    formErrorRef.current[key] = [];
+  }
+
+  return true;
 }

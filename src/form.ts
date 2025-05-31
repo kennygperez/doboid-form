@@ -56,13 +56,13 @@ export function doboidFormFactory<TData>(
       },
     },
     onSubmit(callback) {
-      return (e) => {
+      return async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        runValidator(validator, formStateRef, formErrorRef);
-
-        callback(formStateRef.current);
+        if (await runValidator(validator, formStateRef, formErrorRef)) {
+          callback(formStateRef.current);
+        }
       };
     },
     reset() {
