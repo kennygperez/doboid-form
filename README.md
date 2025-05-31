@@ -8,27 +8,27 @@ doboid form is a TINY, zero dependencies\*, TYPE-SAFE form state management libr
 function SimpleForm() {
   const { Fields, ...dorm } = useForm({
     defaultValues: {
-      str: '',
-      num: 0,
+      email: '',
+      age: 0,
     },
     validators: z.object({
-      str: z.string().email().max(11),
-      num: z.number().max(3),
+      email: z.string().email().max(11),
+      age: z.number().max(3),
     }),
   });
 
   return (
     <form onSubmit={dorm.onSubmit((values) => console.log('success', values))}>
-      <Fields.Str
+      <Fields.Email
         children={(field) => (
           <div>
-            <input {...field.attr} type="text" />
+            <input {...field.attr} type="email" />
             {field.errors.map((e) => (<div key={e}>{e}</div>))}
           </div>
         )}
       />
 
-      <Fields.Num
+      <Fields.Age
         children={(field) => (
           <div>
             <input {...field.attr} type="number" />
