@@ -27,10 +27,8 @@ function Playground() {
     }),
   });
 
-  const onSubmit = dorm.onSubmit((v) => console.log(v));
-
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={dorm.onSubmit((values) => console.log('success', values))}>
       <Fields.Str
         children={(f) => (
           <div>

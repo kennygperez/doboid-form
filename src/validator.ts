@@ -1,5 +1,5 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
-import type { DoboidErrorMap } from './form';
+import type { DoboidErrorMap } from './errors';
 
 export async function runValidator<TData>(
   schema: StandardSchemaV1,

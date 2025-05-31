@@ -1,10 +1,11 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { useRef, useState } from 'react';
+import type { DoboidErrorMap } from './errors';
 import {
   numberPrimitiveFieldComponentFactory,
   stringPrimitiveFieldComponentFactory,
 } from './fields';
-import { type DoboidErrorMap, type DoboidFields, type DoboidForm, doboidFormFactory } from './form';
+import { type DoboidFields, doboidFormFactory } from './form';
 import { capitalize, useRenderSignal } from './utils';
 
 interface DoboidFormConfiguration<in out TData> {
@@ -19,7 +20,7 @@ export function useForm<TData extends Record<string, any>>(config: DoboidFormCon
   const formErrorRef = useRef<DoboidErrorMap>({});
 
   const [doboidForm] = useState(() => {
-    const Fields = {} as DoboidForm<TData>['Fields'];
+    const Fields = {} as DoboidFields<TData>;
 
     for (const key in config.defaultValues) {
       const capitalizedKey = capitalize(key);

@@ -1,4 +1,5 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
+import { type DoboidErrorMap, type DoboidErrors, doboidErrorsFactory } from './errors';
 import type { PrimitiveFieldComponent } from './fields';
 import { runValidator } from './validator';
 
@@ -18,14 +19,6 @@ export interface DoboidForm<in out TData> {
   reset(): void;
 }
 
-export interface DoboidErrors<in out TData, in TKeys = 'root' | Extract<keyof TData, string>> {
-  get(key: TKeys): string[];
-  set(key: TKeys, messages: string[]): void;
-  clear(): void;
-}
-
-export type DoboidErrorMap = Record<string, string[]>;
-
 //
 //
 //
@@ -40,21 +33,7 @@ export function doboidFormFactory<TData>(
 ): DoboidForm<TData> {
   return {
     Fields,
-    errors: {
-      get(key) {
-        return formErrorRef.current[key] ?? [];
-      },
-      set(key, messages) {
-        formErrorRef.current = { ...formErrorRef.current, [key]: messages };
-
-        renderSignal();
-      },
-      clear() {
-        formErrorRef.current = {};
-
-        renderSignal();
-      },
-    },
+    errors: doboidErrorsFactory<TData>(formErrorRef, renderSignal),
     onSubmit(callback) {
       return async (e) => {
         e.preventDefault();
