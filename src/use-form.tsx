@@ -2,10 +2,11 @@ import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { useRef, useState } from 'react';
 import type { DoboidErrorMap } from './errors';
 import {
+  type DoboidFields,
   numberPrimitiveFieldComponentFactory,
   stringPrimitiveFieldComponentFactory,
 } from './fields';
-import { type DoboidFields, doboidFormFactory } from './form';
+import { doboidFormFactory } from './form';
 import { capitalize, useRenderSignal } from './utils';
 
 interface DoboidFormConfiguration<in out TData> {
@@ -13,6 +14,7 @@ interface DoboidFormConfiguration<in out TData> {
   validators: StandardSchemaV1<TData>;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: It could literally be anything
 export function useForm<TData extends Record<string, any>>(config: DoboidFormConfiguration<TData>) {
   const renderSignal = useRenderSignal();
 
