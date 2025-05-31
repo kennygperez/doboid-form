@@ -31,7 +31,8 @@
       },
       "correctness": {
         "noUnusedVariables": "error",
-        "noChildrenProp": "off"
+        "noChildrenProp": "off",
+        "noUnusedImports": "error"
       }
     }
   },

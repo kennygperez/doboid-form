@@ -1,82 +1,71 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { useRef, useState } from 'react';
-import React from 'react';
-import type { DoboidFields, DoboidForm, DoboidFormConfiguration } from './core';
+import {
+  numberPrimitiveFieldComponentFactory,
+  stringPrimitiveFieldComponentFactory,
+} from './fields';
+import { type DoboidErrorMap, type DoboidFields, type DoboidForm, doboidFormFactory } from './form';
+import { capitalize, useRenderSignal } from './utils';
 
-export function useForm<
-  TSchema extends StandardSchemaV1,
-  TData extends StandardSchemaV1.InferInput<TSchema>,
->(config: DoboidFormConfiguration<TSchema, TData>) {
+interface DoboidFormConfiguration<in out TData> {
+  defaultValues: TData;
+  validators: StandardSchemaV1<TData>;
+}
+
+export function useForm<TData extends Record<string, any>>(config: DoboidFormConfiguration<TData>) {
   const renderSignal = useRenderSignal();
-  const formErrorRef = useRef<Record<string, string>>({});
-  const formStateRef = useRef(config.defaultValues);
-  const [doboidForm] = useState<DoboidForm<TData>>(() => {
-    const Fields = {} as DoboidFields<TData>;
+
+  const formStateRef = useRef({ ...config.defaultValues });
+  const formErrorRef = useRef<DoboidErrorMap>({});
+
+  const [doboidForm] = useState(() => {
+    const Fields = {} as DoboidForm<TData>['Fields'];
 
     for (const key in config.defaultValues) {
-      Fields[key] = ({ children }) => {
-        const [data, setData] = useState(formStateRef.current[key]);
+      const capitalizedKey = capitalize(key);
 
-        return children({
-          id: key,
-          name: key,
-          value: data,
-          async handleChange(e) {
-            formStateRef.current[key] = e.target.value as TData[Extract<keyof TData, string>];
+      switch (typeof config.defaultValues[key]) {
+        case 'string': {
+          Fields[capitalizedKey] = stringPrimitiveFieldComponentFactory<typeof key, TData>(
+            key,
+            formStateRef,
+            formErrorRef,
+            config.validators,
+          ) as DoboidFields<TData>[Capitalize<Extract<keyof TData, string>>];
 
-            let result = config.validators['~standard'].validate(formStateRef.current);
+          break;
+        }
 
-            if (result instanceof Promise) result = await result;
+        case 'number': {
+          Fields[capitalizedKey] = numberPrimitiveFieldComponentFactory<typeof key, TData>(
+            key,
+            formStateRef,
+            formErrorRef,
+            config.validators,
+          ) as DoboidFields<TData>[Capitalize<Extract<keyof TData, string>>];
 
-            if (result.issues) {
-              const issues = result.issues.filter((i) => i.path?.join('') === key);
+          break;
+        }
 
-              if (issues.length > 0) {
-                formErrorRef.current[key] = issues[0].message;
-              }
-            } else {
-              formStateRef.current = result.value as TData;
-            }
-
-            setData(formStateRef.current[key]);
-          },
-        });
-      };
+        default:
+          // biome-ignore lint/suspicious/noConsole: dx++
+          console.warn(
+            'received an unsupported prop type',
+            `[${key}]:${config.defaultValues[key]}`,
+          );
+          break;
+      }
     }
 
-    return {
+    return doboidFormFactory(
+      config.defaultValues,
+      formStateRef,
+      formErrorRef,
       Fields,
-      errors: {
-        get(key) {
-          return formErrorRef.current[key];
-        },
-        set(key, message) {
-          formErrorRef.current = { ...formErrorRef.current, [key]: message };
-
-          renderSignal();
-        },
-        clear() {
-          formErrorRef.current = {};
-
-          renderSignal();
-        },
-      },
-      handleSubmit(callback) {
-        callback(formStateRef.current);
-      },
-      reset() {
-        formStateRef.current = config.defaultValues;
-
-        renderSignal();
-      },
-    };
+      config.validators,
+      renderSignal,
+    );
   });
 
   return doboidForm;
-}
-
-function useRenderSignal() {
-  const [_, setNumber] = useState(Math.random());
-
-  return () => setNumber(Math.random());
 }
