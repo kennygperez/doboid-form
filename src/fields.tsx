@@ -12,6 +12,7 @@ export interface DoboidField<in out TKey extends string, in out TValue> {
     value: TValue;
     onChange: ChangeEventHandler<HTMLInputElement>;
   };
+  handleChange(value: TValue): void;
   errors: string[];
 }
 
@@ -24,7 +25,9 @@ export type DoboidFields<in out TData> = {
     ? PrimitiveFieldComponent<TKey, string>
     : TData[TKey] extends number
       ? PrimitiveFieldComponent<TKey, number>
-      : never;
+      : TData[TKey] extends boolean
+        ? PrimitiveFieldComponent<TKey, boolean>
+        : never;
 };
 
 //
@@ -55,6 +58,12 @@ export function stringPrimitiveFieldComponentFactory<
           renderSignal();
         },
       },
+      async handleChange(value) {
+        formStateRef.current[key] = value as TData[TKey];
+        formErrorRef.current[key] = await validateField(schema, formStateRef, key);
+
+        renderSignal();
+      },
       errors: formErrorRef.current[key] ?? [],
     });
   };
@@ -83,6 +92,47 @@ export function numberPrimitiveFieldComponentFactory<
 
           renderSignal();
         },
+      },
+      async handleChange(value) {
+        formStateRef.current[key] = value as TData[TKey];
+        formErrorRef.current[key] = await validateField(schema, formStateRef, key);
+
+        renderSignal();
+      },
+      errors: formErrorRef.current[key] ?? [],
+    });
+  };
+}
+
+export function booleanPrimitiveFieldComponentFactory<
+  const TKey extends string,
+  TData extends Record<TKey, boolean>,
+>(
+  key: TKey,
+  formStateRef: React.RefObject<TData>,
+  formErrorRef: React.RefObject<DoboidErrorMap>,
+  schema: StandardSchemaV1,
+): PrimitiveFieldComponent<TKey, boolean> {
+  return ({ children }) => {
+    const renderSignal = useRenderSignal();
+
+    return children({
+      attr: {
+        id: key,
+        name: key,
+        value: formStateRef.current[key],
+        async onChange(e) {
+          formStateRef.current[key] = e.target.checked as TData[TKey];
+          formErrorRef.current[key] = await validateField(schema, formStateRef, key);
+
+          renderSignal();
+        },
+      },
+      async handleChange(value) {
+        formStateRef.current[key] = value as TData[TKey];
+        formErrorRef.current[key] = await validateField(schema, formStateRef, key);
+
+        renderSignal();
       },
       errors: formErrorRef.current[key] ?? [],
     });

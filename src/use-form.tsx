@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import type { DoboidErrorMap } from './errors';
 import {
   type DoboidFields,
+  booleanPrimitiveFieldComponentFactory,
   numberPrimitiveFieldComponentFactory,
   stringPrimitiveFieldComponentFactory,
 } from './fields';
@@ -41,6 +42,17 @@ export function useForm<TData extends Record<string, any>>(config: DoboidFormCon
 
         case 'number': {
           Fields[capitalizedKey] = numberPrimitiveFieldComponentFactory<typeof key, TData>(
+            key,
+            formStateRef,
+            formErrorRef,
+            config.validators,
+          ) as DoboidFields<TData>[Capitalize<Extract<keyof TData, string>>];
+
+          break;
+        }
+
+        case 'boolean': {
+          Fields[capitalizedKey] = booleanPrimitiveFieldComponentFactory<typeof key, TData>(
             key,
             formStateRef,
             formErrorRef,

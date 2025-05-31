@@ -20,10 +20,12 @@ function Playground() {
     defaultValues: {
       str: '',
       num: 0,
+      bool: false,
     },
     validators: z.object({
       str: z.string().email().max(11),
       num: z.number().max(3),
+      bool: z.boolean(),
     }),
   });
 
@@ -44,6 +46,17 @@ function Playground() {
         children={(f) => (
           <div>
             <input {...f.attr} type="number" />
+            {f.errors.map((e) => (
+              <div key={e}>{e}</div>
+            ))}
+          </div>
+        )}
+      />
+
+      <Fields.Bool
+        children={(f) => (
+          <div>
+            <input type="checkbox" onChange={f.attr.onChange} checked={f.attr.value} />
             {f.errors.map((e) => (
               <div key={e}>{e}</div>
             ))}
