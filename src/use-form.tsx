@@ -1,86 +1,28 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { useRef, useState } from 'react';
+import { type DoboidFormData, createFormDataInitialValues } from './data';
 import type { DoboidErrorMap } from './errors';
-import {
-  type DoboidFields,
-  booleanPrimitiveFieldComponentFactory,
-  numberPrimitiveFieldComponentFactory,
-  stringPrimitiveFieldComponentFactory,
-} from './fields';
 import { doboidFormFactory } from './form';
-import { capitalize, useRenderSignal } from './utils';
+import { useRenderSignal } from './utils';
 
-interface DoboidFormConfiguration<in out TData> {
-  defaultValues: TData;
-  validators: StandardSchemaV1<TData>;
+interface DoboidFormConfiguration<in out TData extends DoboidFormData> {
+  readonly defaultValues: TData;
+  readonly validators: StandardSchemaV1<TData>;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: It could literally be anything
-export function useForm<TData extends Record<string, any>>(config: DoboidFormConfiguration<TData>) {
+export function useForm<TData extends DoboidFormData>(config: DoboidFormConfiguration<TData>) {
   const renderSignal = useRenderSignal();
-
-  const formStateRef = useRef({ ...config.defaultValues });
+  const formStateRef = useRef(createFormDataInitialValues(config.defaultValues));
   const formErrorRef = useRef<DoboidErrorMap>({});
-
-  const [doboidForm] = useState(() => {
-    const Fields = {} as DoboidFields<TData>;
-
-    for (const key in config.defaultValues) {
-      const capitalizedKey = capitalize(key);
-
-      switch (typeof config.defaultValues[key]) {
-        case 'string': {
-          Fields[capitalizedKey] = stringPrimitiveFieldComponentFactory<typeof key, TData>(
-            key,
-            formStateRef,
-            formErrorRef,
-            config.validators,
-          ) as DoboidFields<TData>[Capitalize<Extract<keyof TData, string>>];
-
-          break;
-        }
-
-        case 'number': {
-          Fields[capitalizedKey] = numberPrimitiveFieldComponentFactory<typeof key, TData>(
-            key,
-            formStateRef,
-            formErrorRef,
-            config.validators,
-          ) as DoboidFields<TData>[Capitalize<Extract<keyof TData, string>>];
-
-          break;
-        }
-
-        case 'boolean': {
-          Fields[capitalizedKey] = booleanPrimitiveFieldComponentFactory<typeof key, TData>(
-            key,
-            formStateRef,
-            formErrorRef,
-            config.validators,
-          ) as DoboidFields<TData>[Capitalize<Extract<keyof TData, string>>];
-
-          break;
-        }
-
-        default:
-          // biome-ignore lint/suspicious/noConsole: dx++
-          console.warn(
-            'received an unsupported prop type',
-            `[${key}]:${config.defaultValues[key]}`,
-          );
-          break;
-      }
-    }
-
-    return doboidFormFactory(
+  const [doboidForm] = useState(
+    doboidFormFactory(
       config.defaultValues,
       formStateRef,
       formErrorRef,
-      Fields,
       config.validators,
-      renderSignal,
-    );
-  });
+      renderSignal.triggerRender,
+    ),
+  );
 
   return doboidForm;
 }

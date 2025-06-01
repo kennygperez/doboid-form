@@ -1,8 +1,9 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
+import type { DoboidFormData } from './data';
 import type { DoboidErrorMap } from './errors';
 
-export async function validateField<TData>(
-  schema: StandardSchemaV1,
+export async function validateField<TData extends DoboidFormData>(
+  schema: StandardSchemaV1<TData>,
   formStateRef: React.RefObject<TData>,
   key: string,
 ): Promise<string[]> {
@@ -18,13 +19,13 @@ export async function validateField<TData>(
     return issues.map((i) => i.message);
   }
 
-  formStateRef.current = result.value as TData;
+  formStateRef.current = result.value;
 
   return [];
 }
 
-export async function validateForm<TData>(
-  schema: StandardSchemaV1,
+export async function validateForm<TData extends DoboidFormData>(
+  schema: StandardSchemaV1<TData>,
   formStateRef: React.RefObject<TData>,
   formErrorRef: React.RefObject<DoboidErrorMap>,
 ): Promise<boolean> {
@@ -52,7 +53,7 @@ export async function validateForm<TData>(
     return false;
   }
 
-  formStateRef.current = result.value as TData;
+  formStateRef.current = result.value;
   formErrorRef.current = {};
 
   return true;

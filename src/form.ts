@@ -1,34 +1,26 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
+import { type DoboidFormData, createFormDataInitialValues } from './data';
 import { type DoboidErrorMap, type DoboidErrors, doboidErrorsFactory } from './errors';
-import type { DoboidFields } from './fields';
+import { type DoboidFields, doboidFieldsFactory } from './fields';
 import { validateForm } from './validators';
 
-export interface DoboidForm<in out TData> {
+export interface DoboidForm<in out TData extends DoboidFormData> {
   errors: DoboidErrors<TData>;
   Fields: DoboidFields<TData>;
-  //
   onSubmit(callback: (values: TData) => void): React.FormEventHandler<HTMLFormElement>;
   reset(): void;
 }
 
-//
-//
-//
-
-export function doboidFormFactory<TData>(
+export function doboidFormFactory<TData extends DoboidFormData>(
   defaultValues: TData,
   formStateRef: React.RefObject<TData>,
   formErrorRef: React.RefObject<DoboidErrorMap>,
-  Fields: DoboidFields<TData>,
-  validator: StandardSchemaV1,
-  renderSignal: () => void,
+  validator: StandardSchemaV1<TData>,
+  triggerRender: () => void,
 ): DoboidForm<TData> {
   return {
-    Fields,
-    //
-    //
-    //
-    errors: doboidErrorsFactory<TData>(formErrorRef, renderSignal),
+    Fields: doboidFieldsFactory(defaultValues, formStateRef, formErrorRef, validator),
+    errors: doboidErrorsFactory(formErrorRef, triggerRender),
     //
     //
     //
@@ -38,7 +30,7 @@ export function doboidFormFactory<TData>(
         e.stopPropagation();
 
         if (!(await validateForm(validator, formStateRef, formErrorRef))) {
-          renderSignal();
+          triggerRender();
 
           return;
         }
@@ -47,10 +39,10 @@ export function doboidFormFactory<TData>(
       };
     },
     reset() {
-      formStateRef.current = { ...defaultValues };
+      formStateRef.current = createFormDataInitialValues(defaultValues);
       formErrorRef.current = {};
 
-      renderSignal();
+      triggerRender();
     },
   };
 }
