@@ -43,3 +43,8 @@ function SimpleForm() {
   );
 }
 ```
+
+## Roadmap
+
+- [ ] add nested object support
+- [ ] add array support
